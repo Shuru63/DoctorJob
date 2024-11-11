@@ -1,19 +1,19 @@
-#DoctorJob Portal
+# DoctorJob Portal
 A job portal built using the MERN stack (MongoDB, Express.js, React.js, Node.js) tailored for medical professionals such as doctors, nurses, compounders, and medical students. The platform allows users to find and offer job opportunities in the healthcare industry.
 
-###Features
-###User Features:
+### Features
+### User Features:
 Registration & Login: Users can sign up, log in, and securely authenticate using JWT tokens.
 Profile Management: Users can update their personal and professional profiles.
 Job Search: Medical professionals can search for job opportunities based on location, specialization, etc.
 Job Application: Users can apply for jobs posted by various healthcare organizations.
 Job Posting (For Employers): Employers can create and manage job listings.
 Admin Dashboard: Admin can manage users, jobs, and applications.
-###Admin Features:
+### Admin Features:
 User Management: Admin can view and manage users' profiles.
 Job Management: Admin can manage posted jobs, including approval/rejection.
 Application Tracking: Admin can track applications submitted by users to jobs.
-###Tech Stack
+### Tech Stack
 Frontend: React.js, Redux, Bootstrap
 Backend: Node.js, Express.js
 Database: MongoDB
