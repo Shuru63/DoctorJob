@@ -1,4 +1,5 @@
 import React from 'react'
+import "./Navigation.css";
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { Button } from '../ui/button'
 import { Avatar, AvatarImage } from '../ui/avatar'
@@ -6,7 +7,6 @@ import { LogOut, User2 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
-import { USER_API_END_POINT } from '@/utils/constant'
 import { setUser } from '@/redux/authSlice'
 import { toast } from 'sonner'
 
@@ -17,7 +17,7 @@ const Navbar = () => {
 
     const logoutHandler = async () => {
         try {
-            const res = await axios.get(`${USER_API_END_POINT}/logout`, { withCredentials: true });
+            const res = await axios.get(`api/v1/user/logout`, { withCredentials: true });
             if (res.data.success) {
                 dispatch(setUser(null));
                 navigate("/");
@@ -30,9 +30,10 @@ const Navbar = () => {
     }
     return (
         <div className='bg-white'>
+            <div className='nav-bar'>
             <div className='flex items-center justify-between mx-auto max-w-7xl h-16'>
                 <div>
-                    <h1 className='text-2xl font-bold'>Doctor<span className='text-[#F83002]'>Job</span></h1>
+                <Link to="/"> <h1 className='text-2xl font-bold'>Doctor<span className='text-[#F83002]'>Job</span></h1></Link>
                 </div>
                 <div className='flex items-center gap-12'>
                     <ul className='flex font-medium items-center gap-5'>
@@ -100,7 +101,7 @@ const Navbar = () => {
 
                 </div>
             </div>
-
+</div>
         </div>
     )
 }

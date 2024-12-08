@@ -1,161 +1,167 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from '../shared/Navbar'
-import { Label } from '../ui/label'
-import { Input } from '../ui/input'
-import { RadioGroup } from '../ui/radio-group'
-import { Button } from '../ui/button'
-import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
-import { USER_API_END_POINT } from '@/utils/constant'
-import { toast } from 'sonner'
-import { useDispatch, useSelector } from 'react-redux'
-import { setLoading } from '@/redux/authSlice'
-import { Loader2 } from 'lucide-react'
+import React, { useEffect, useState } from 'react';
+import Navbar from '../shared/Navbar';
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'sonner';
+import { useDispatch, useSelector } from 'react-redux';
+import { setLoading } from '@/redux/authSlice';
 
 const Signup = () => {
-
-    const [input, setInput] = useState({
-        fullname: "",
-        email: "",
-        phoneNumber: "",
-        password: "",
-        role: "",
-        file: ""
-    });
-    const {loading,user} = useSelector(store=>store.auth);
+    const [password, setPassword] = useState(true)
+    const [fname, setFname] = useState('');
+    const [email, setEmail] = useState('');
+    const [inputPassword, setInputPassword] = useState('');
+    const [phone, setPhone] = useState('');
+    const [cFile, setCfile] = useState('');
+   
+    const [userType, setUserType] = useState(""); // Using state for userType
+    const { loading, user } = useSelector((store) => store.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+  
+   
 
-    const changeEventHandler = (e) => {
-        setInput({ ...input, [e.target.name]: e.target.value });
-    }
-    const changeFileHandler = (e) => {
-        setInput({ ...input, file: e.target.files?.[0] });
-    }
     const submitHandler = async (e) => {
         e.preventDefault();
-        const formData = new FormData();    //formdata object
-        formData.append("fullname", input.fullname);
-        formData.append("email", input.email);
-        formData.append("phoneNumber", input.phoneNumber);
-        formData.append("password", input.password);
-        formData.append("role", input.role);
-        if (input.file) {
-            formData.append("file", input.file);
+        if(!fname || !email || !inputPassword || !userType ||!phone){
+            toast.error("fill all the required"); 
         }
-
         try {
+            // Dispatch= loading state
             dispatch(setLoading(true));
-            const res = await axios.post(`${USER_API_END_POINT}/register`, formData, {
-                headers: { 'Content-Type': "multipart/form-data" },
-                withCredentials: true,
-            });
+    
+            const formData = new FormData();
+            formData.append("fullname", fname);
+            formData.append("email", email);
+            formData.append("password", inputPassword);
+            formData.append("role", userType);
+            formData.append("phoneNumber", phone);
+            if (cFile) {
+                formData.append("file", cFile); 
+            }
+            const res = await axios.post(
+                `/api/v1/user/register`,
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                    withCredentials: true,
+                }
+            );
+    
             if (res.data.success) {
-                navigate("/login");
                 toast.success(res.data.message);
+                navigate("/login");
             }
         } catch (error) {
-            console.log(error);
-            toast.error(error.response.data.message);
-        } finally{
+            
+            console.error("Error during registration:", error);
+            if (error.response?.data?.message) {
+                toast.error(error.response.data.message);
+            } else {
+                toast.error("Something went wrong. Please try again later.");
+            }
+        } finally {
             dispatch(setLoading(false));
         }
-    }
-
-    useEffect(()=>{
-        if(user){
+    };
+    
+    useEffect(() => {
+        if (user) {
             navigate("/");
         }
-    },[])
+    }, [user, navigate]);
+
     return (
         <div>
             <Navbar />
-            <div className='flex items-center justify-center max-w-7xl mx-auto'>
-                <form onSubmit={submitHandler} className='w-1/2 border border-gray-200 rounded-md p-4 my-10'>
-                    <h1 className='font-bold text-xl mb-5'>Sign Up</h1>
-                    <div className='my-2'>
+            <div className="flex items-center justify-center max-w-7xl mx-auto margin-section">
+                <form
+                    onSubmit={submitHandler}
+                    className="w-1/2 border border-gray-200 rounded-md p-4 my-10"
+                >
+                    <h1 className="font-bold text-xl mb-5">Sign Up</h1>
+                    <div className="my-2">
                         <Label>Full Name</Label>
                         <Input
                             type="text"
-                            value={input.fullname}
                             name="fullname"
-                            onChange={changeEventHandler}
-                            placeholder="patel"
+                            onChange={(e) => setFname(e.target.value)}
+                            placeholder="Full Name"
                         />
                     </div>
-                    <div className='my-2'>
+                    <div className="my-2">
                         <Label>Email</Label>
                         <Input
                             type="email"
-                            value={input.email}
                             name="email"
-                            onChange={changeEventHandler}
-                            placeholder="patel@gmail.com"
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Email"
                         />
                     </div>
-                    <div className='my-2'>
+                    <div className="my-2">
                         <Label>Phone Number</Label>
                         <Input
                             type="text"
-                            value={input.phoneNumber}
                             name="phoneNumber"
-                            onChange={changeEventHandler}
-                            placeholder="8080808080"
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder="Phone Number"
                         />
                     </div>
-                    <div className='my-2'>
-                        <Label>Password</Label>
-                        <Input
-                            type="password"
-                            value={input.password}
-                            name="password"
-                            onChange={changeEventHandler}
-                            placeholder="patel@gmail.com"
-                        />
-                    </div>
-                    <div className='flex items-center justify-between'>
-                        <RadioGroup className="flex items-center gap-4 my-5">
-                            <div className="flex items-center space-x-2">
-                                <Input
-                                    type="radio"
-                                    name="role"
-                                    value="student"
-                                    checked={input.role === 'student'}
-                                    onChange={changeEventHandler}
-                                    className="cursor-pointer"
-                                />
-                                <Label htmlFor="r1">Student</Label>
+                    <div className='log-userpassword my-2 '>
+                                <Label>Password</Label>
+                            <Input type={password ? 'password' : 'text'} placeholder='enter password' onChange={(e) => setInputPassword(e.target.value)} />
+                            <div className='password-eye' onClick={() => setPassword((prev) => !prev)}>
+                                {
+                                    password ?
+                                        <span class="material-symbols-outlined">
+                                            visibility_off
+                                        </span> : <span class="material-symbols-outlined">
+                                            visibility
+                                        </span>
+                                }
+
                             </div>
-                            <div className="flex items-center space-x-2">
-                                <Input
-                                    type="radio"
-                                    name="role"
-                                    value="recruiter"
-                                    checked={input.role === 'recruiter'}
-                                    onChange={changeEventHandler}
-                                    className="cursor-pointer"
-                                />
-                                <Label htmlFor="r2">Recruiter</Label>
-                            </div>
-                        </RadioGroup>
-                        <div className='flex items-center gap-2'>
+                        </div>
+                    <div className="flex items-center justify-between my-5">
+                        <div className="flex items-center space-x-2">
+                            <Label>Role</Label>
+                            <select
+                                name="role"
+                                value={userType}
+                                onChange={(e) => setUserType(e.target.value)}
+                                className="border border-gray-300 rounded-md px-2 py-1"
+                            >
+                                <option value="">Select Role</option>
+                                <option value="student">Student</option>
+                                <option value="recruiter">Recruiter</option>
+                            </select>
+                        </div>
+                        <div className="flex items-center gap-2">
                             <Label>Profile</Label>
                             <Input
                                 accept="image/*"
                                 type="file"
-                                onChange={changeFileHandler}
+                                onChange={(e) => setCfile(e.target.files[0])}
                                 className="cursor-pointer"
                             />
                         </div>
                     </div>
-                    {
-                        loading ? <Button className="w-full my-4"> <Loader2 className='mr-2 h-4 w-4 animate-spin' /> Please wait </Button> : <Button type="submit" className="w-full my-4">Signup</Button>
-                    }
-                    <span className='text-sm'>Already have an account? <Link to="/login" className='text-blue-600'>Login</Link></span>
+                    <Button type="submit" className="w-full my-4">
+                        {loading ? "Please wait..." : "Signup"}
+                    </Button>
+                    <span className="text-sm">
+                        Already have an account?{" "}
+                        <Link to="/login" className="text-blue-600">
+                            Login
+                        </Link>
+                    </span>
                 </form>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Signup
+export default Signup;
