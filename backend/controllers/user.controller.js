@@ -7,15 +7,17 @@ const cloudinary = require("../utils/cloudinary.js");
  const register = async (req, res) => {
     try {
         const { fullname, email, phoneNumber, password, role } = req.body;
-         
         if (!fullname || !email || !phoneNumber || !password || !role) {
             return res.status(400).json({
-                message: "Something is missing",
-                success: false
+                message: "fill all the required",
+                success: false 
             });
         };
-        const file = req.file;
-        const fileUri = getDataUri(file);
+        const file = req.file; 
+        if (!file) {
+            return res.status(400).json({ message: "Profile photo is required", success: false });
+        }
+        const fileUri = getDataUri(file); 
         const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
 
         const user = await User.findOne({ email });
@@ -81,7 +83,7 @@ const cloudinary = require("../utils/cloudinary.js");
         const tokenData = {
             userId: user._id
         }
-        const token = await jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
+        const token = await jwt.sign(tokenData, process.env.JWT_SECRET, { expiresIn: '1d' });
 
         user = {
             _id: user._id,
